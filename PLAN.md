@@ -269,9 +269,9 @@ Equip APEX staff with WhatsApp-based command controls to vet companies, log load
 
 ### Tasks
 
-- [ ] **Role-Based Whitelist Middleware:**
+- [x] **Role-Based Whitelist Middleware:**
   - Intercept incoming messages. If command starts with `/` (admin command), verify `sender_phone` exists in `apex_staff` table. Block unauthorized calls silently or return permission error.
-- [ ] **Staff Slash Command Implementations:**
+- [x] **Staff Slash Command Implementations:**
 
   - `/pending`: Fetch and list up to 5 unvetted leads (`NEW_LEAD`).
   - `/vet [lead_id]`: Update lead status to `VETTED`.
@@ -283,7 +283,7 @@ Equip APEX staff with WhatsApp-based command controls to vet companies, log load
     - Set all associated pending leads to `REJECTED_FRAUD`.
     - Revoke active WhatsApp session.
     - Send termination notification to student.
-- [ ] **Rate-Limiting & Security Hardening:**
+- [x] **Rate-Limiting & Security Hardening:**
   - Implement basic message rate-limiter (e.g., max 10 messages/minute per user) to mitigate spam loops.
 
 ### Phase 5 Deliverables

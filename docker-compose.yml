@@ -21,7 +21,9 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://apex:apex_dev_password@postgres:5432/apex_partnership}
       BAILEYS_GATEWAY_URL: ${BAILEYS_GATEWAY_URL:-http://baileys-gateway:3000}
       WEBHOOK_SHARED_SECRET: ${WEBHOOK_SHARED_SECRET:-dev-webhook-secret}
+      APEX_BOT_PHONE: ${APEX_BOT_PHONE:-27712345678}
       APEX_STAFF_GROUP_PHONE: ${APEX_STAFF_GROUP_PHONE:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:

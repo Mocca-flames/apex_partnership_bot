@@ -1,8 +1,8 @@
 # APEX Partnership
 
-## Current Phase: 4
+## Current Phase: 5
 
-The project now includes the Phase 4 lead intake engine: ACTIVE students can submit transporter leads through WhatsApp, duplicate fleet-owner numbers are rejected, leads are persisted as `NEW_LEAD`, staff receive queue alerts, and students can reply `STATUS` to view their pipeline.
+The project now includes the Phase 5 staff operations engine: APEX staff can vet leads (`/vet`), mark trucks loaded (`/load`), process payouts (`/pay`), and ban fraudulent students (`/fraud`) directly from WhatsApp. Rate limiting (10 msgs/min) and role-based access control protect admin commands. `PERMANENT_BAN` status is enforced.
 
 ### Start
 
@@ -24,4 +24,4 @@ docker compose ps
 
 The backend migration runs automatically before FastAPI starts. The normalized inbound webhook is `POST /webhook/whatsapp`; outbound messages use `POST /api/v1/messages`.
 
-Staff slash commands and vetting operations remain scheduled for Phase 5.
+Staff slash commands are now active (Phase 5).

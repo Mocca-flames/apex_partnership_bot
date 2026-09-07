@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     apex_bot_phone: str = "27712345678"
     tutorial_pdf_path: str = "/app/tutorial-placeholder.pdf"
     apex_staff_group_phone: str = ""
+    cors_origins: str = "*"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
