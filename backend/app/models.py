@@ -45,6 +45,24 @@ class Transporter(Base):
     student: Mapped[Student] = relationship(back_populates="transporters")
 
 
+class LeadSubmissionSession(Base):
+    __tablename__ = "lead_submission_sessions"
+
+    student_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("students.id", ondelete="CASCADE"), primary_key=True
+    )
+    step: Mapped[str] = mapped_column(String(30), nullable=False, default="PHONE")
+    fleet_owner_phone: Mapped[str | None] = mapped_column(String(30))
+    company_name: Mapped[str | None] = mapped_column(String(255))
+    truck_count: Mapped[int | None] = mapped_column(Integer)
+    truck_type: Mapped[str | None] = mapped_column(String(50))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    student: Mapped[Student] = relationship()
+
+
 class ApexStaff(Base):
     __tablename__ = "apex_staff"
 

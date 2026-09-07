@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from .config import settings
 from .database import get_db
-from .models import ApexStaff, AuditLog, Student
+from .models import ApexStaff, AuditLog, LeadSubmissionSession, Student, Transporter
 from .routers import students
 from .schemas import InboundMessage, OutboundMessage, WebhookResponse
 
@@ -38,6 +38,7 @@ async def send_whatsapp_message(
     text_content: str,
     media_url: str | None = None,
     media_filename: str | None = None,
+    buttons: list[str] | None = None,
 ) -> None:
     async with httpx.AsyncClient(base_url=settings.baileys_gateway_url, timeout=10) as client:
         response = await client.post("/messages", json={
@@ -45,6 +46,7 @@ async def send_whatsapp_message(
             "text_content": text_content,
             "media_url": media_url,
             "media_filename": media_filename,
+            "buttons": buttons,
         })
     if response.is_error:
         raise HTTPException(status_code=response.status_code, detail="Baileys gateway rejected message")
@@ -77,6 +79,52 @@ def practice_submission_errors(fields: dict[str, str] | None) -> list[str]:
     if fields.get("trucks") != str(PRACTICE_TRUCK_COUNT):
         errors.append(f"the truck count must be {PRACTICE_TRUCK_COUNT}")
     return errors
+
+
+def normalize_phone(phone: str) -> str:
+    return re.sub(r"\D", "", phone)
+
+
+def lead_status_label(status: str) -> str:
+    return {
+        "NEW_LEAD": "Under Review",
+        "VETTED": "Verified (Awaiting Load)",
+        "LOADED": "Truck Loaded (Commission Pending)",
+        "PAID": "Commission Paid!",
+    }.get(status, "Closed / Rejected" if status.startswith("REJECTED_") else status.title())
+
+
+def lead_status_summary(leads: list[Transporter]) -> str:
+    if not leads:
+        return "📋 You have no submitted leads yet. Reply *LEAD* to submit one."
+    lines = ["📋 Your APEX lead pipeline:"]
+    for lead in leads:
+        lines.append(f"• {lead.company_name} ({lead.truck_count} trucks): {lead_status_label(lead.status)}")
+    return "\n".join(lines)
+
+
+async def notify_staff_of_lead(db: Session, lead: Transporter, student: Student) -> None:
+    message = (
+        "📥 New transporter lead\n\n"
+        f"Company: {lead.company_name}\n"
+        f"Fleet manager: {lead.fleet_owner_phone}\n"
+        f"Trucks: {lead.truck_count}\n"
+        f"Type: {lead.truck_type}\n"
+        f"Student: {student.first_name} {student.surname}\n"
+        f"Student ID: {student.id}\n"
+        "Use /pending to review the queue."
+    )
+    recipients = [settings.apex_staff_group_phone] if settings.apex_staff_group_phone else [
+        staff.phone_number for staff in db.query(ApexStaff).filter(ApexStaff.role.in_(["ADMIN", "STAFF"])).all()
+    ]
+    for recipient in recipients:
+        if recipient:
+            await send_whatsapp_message(recipient, message)
+
+
+def lead_phone_is_registered(db: Session, phone: str) -> bool:
+    normalized = normalize_phone(phone)
+    return any(normalize_phone(lead.fleet_owner_phone) == normalized for lead in db.query(Transporter).all())
 
 
 async def notify_staff_of_hold(db: Session, student: Student, sender_phone: str) -> None:
@@ -235,6 +283,106 @@ async def whatsapp_webhook(
         await send_whatsapp_message(message.sender_phone, reply)
         if attempt >= 3:
             await notify_staff_of_hold(db, tutorial_student, message.sender_phone)
+        return WebhookResponse(accepted=True, message_id=inbound_id)
+
+    active_student = db.query(Student).filter(
+        Student.whatsapp_number == message.sender_phone,
+        Student.status == "ACTIVE",
+    ).first()
+    if active_student:
+        text = message.text_content.strip()
+        command = text.upper()
+        if command in {"/STATUS", "STATUS"}:
+            leads = db.query(Transporter).filter(Transporter.student_id == active_student.id).order_by(Transporter.created_at.desc()).all()
+            await send_whatsapp_message(message.sender_phone, lead_status_summary(leads))
+            return WebhookResponse(accepted=True, message_id=inbound_id)
+
+        session = db.query(LeadSubmissionSession).filter(
+            LeadSubmissionSession.student_id == active_student.id,
+        ).first()
+        if not session and command in {"LEAD", "SUBMIT LEAD", "/LEAD", "NEW LEAD"}:
+            session = LeadSubmissionSession(student_id=active_student.id, step="PHONE")
+            db.add(session)
+            db.commit()
+            await send_whatsapp_message(
+                message.sender_phone,
+                "Let's capture a transporter lead. Send the fleet owner / manager cellphone number.",
+            )
+            return WebhookResponse(accepted=True, message_id=inbound_id)
+
+        if session:
+            if session.step == "PHONE":
+                phone = normalize_phone(text)
+                if not 10 <= len(phone) <= 15:
+                    await send_whatsapp_message(message.sender_phone, "Please send a valid cellphone number, including the country code if needed.")
+                    return WebhookResponse(accepted=True, message_id=inbound_id)
+                if lead_phone_is_registered(db, phone):
+                    db.delete(session)
+                    db.add(AuditLog(
+                        event_type="DUPLICATE_TRANSPORTER_REJECTED",
+                        actor_phone=message.sender_phone,
+                        payload={"fleet_owner_phone": phone, "student_id": str(active_student.id)},
+                    ))
+                    db.commit()
+                    await send_whatsapp_message(message.sender_phone, "❌ Transporter phone number already registered in APEX network.")
+                    return WebhookResponse(accepted=True, message_id=inbound_id)
+                session.fleet_owner_phone = phone
+                session.step = "COMPANY"
+                db.commit()
+                await send_whatsapp_message(message.sender_phone, "What is the transporter company name?")
+                return WebhookResponse(accepted=True, message_id=inbound_id)
+
+            if session.step == "COMPANY":
+                if not text or len(text) > 255:
+                    await send_whatsapp_message(message.sender_phone, "Please send a company name up to 255 characters.")
+                    return WebhookResponse(accepted=True, message_id=inbound_id)
+                session.company_name = text
+                session.step = "TRUCK_COUNT"
+                db.commit()
+                await send_whatsapp_message(message.sender_phone, "How many trucks does the transporter operate? Send a whole number.")
+                return WebhookResponse(accepted=True, message_id=inbound_id)
+
+            if session.step == "TRUCK_COUNT":
+                if not text.isdigit() or int(text) < 1 or int(text) > 10000:
+                    await send_whatsapp_message(message.sender_phone, "Please send a valid truck count as a whole number.")
+                    return WebhookResponse(accepted=True, message_id=inbound_id)
+                session.truck_count = int(text)
+                session.step = "TRUCK_TYPE"
+                db.commit()
+                await send_whatsapp_message(
+                    message.sender_phone,
+                    "Select the truck type:",
+                    buttons=["Superlink", "Lowbed", "Mixed"],
+                )
+                return WebhookResponse(accepted=True, message_id=inbound_id)
+
+            if session.step == "TRUCK_TYPE":
+                truck_type = text.upper().replace("-", "")
+                truck_types = {"SUPERLINK": "SUPERLINK", "LOWBED": "LOWBED", "MIXED": "MIXED", "1": "SUPERLINK", "2": "LOWBED", "3": "MIXED"}
+                if truck_type not in truck_types:
+                    await send_whatsapp_message(message.sender_phone, "Please choose Superlink, Lowbed, or Mixed.", buttons=["Superlink", "Lowbed", "Mixed"])
+                    return WebhookResponse(accepted=True, message_id=inbound_id)
+                lead = Transporter(
+                    student_id=active_student.id,
+                    company_name=session.company_name or "",
+                    fleet_owner_phone=session.fleet_owner_phone or "",
+                    truck_count=session.truck_count,
+                    truck_type=truck_types[truck_type],
+                    status="NEW_LEAD",
+                )
+                db.add(lead)
+                db.delete(session)
+                db.add(AuditLog(
+                    event_type="LEAD_SUBMITTED",
+                    actor_phone=message.sender_phone,
+                    payload={"student_id": str(active_student.id), "company_name": lead.company_name},
+                ))
+                db.commit()
+                await send_whatsapp_message(message.sender_phone, "✅ Lead received and queued for APEX review. Reply *STATUS* to track it.")
+                await notify_staff_of_lead(db, lead, active_student)
+                return WebhookResponse(accepted=True, message_id=inbound_id)
+
+        await send_whatsapp_message(message.sender_phone, "Reply *LEAD* to submit a transporter or *STATUS* to view your pipeline.")
         return WebhookResponse(accepted=True, message_id=inbound_id)
 
     held_student = db.query(Student).filter(

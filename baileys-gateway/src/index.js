@@ -40,7 +40,7 @@ function normalizePhone(jid) {
   return jid.split(":")[0].split("@")[0];
 }
 
-function queueOutbound(recipientPhone, textContent, mediaUrl, mediaFilename) {
+function queueOutbound(recipientPhone, textContent, mediaUrl, mediaFilename, buttons) {
   const messageId = crypto.randomUUID();
   outboundQueue = outboundQueue.then(async () => {
     if (!socket || connectionState !== "open") {
@@ -53,6 +53,18 @@ function queueOutbound(recipientPhone, textContent, mediaUrl, mediaFilename) {
         mimetype: "application/pdf",
         fileName: mediaFilename || "APEX-Tutorial.pdf",
         caption: textContent,
+      });
+      return;
+    }
+    if (buttons?.length) {
+      await socket.sendMessage(jid, {
+        text: textContent,
+        footer: "APEX Partnership",
+        buttons: buttons.map((displayText, index) => ({
+          buttonId: String(index + 1),
+          buttonText: { displayText },
+          type: 1,
+        })),
       });
       return;
     }
@@ -69,6 +81,9 @@ async function relayInbound(message) {
     || message.message?.extendedTextMessage?.text
     || message.message?.imageMessage?.caption
     || message.message?.videoMessage?.caption
+    || message.message?.buttonsResponseMessage?.selectedButtonId
+    || message.message?.templateButtonReplyMessage?.selectedId
+    || message.message?.listResponseMessage?.singleSelectReply?.selectedRowId
     || "";
 
   const payload = {
@@ -155,12 +170,18 @@ app.get("/health", (_request, response) => {
   response.json({ status: "ok", whatsapp_connection: connectionState });
 });
 app.post("/messages", async (request, response) => {
-  const { recipient_phone: recipientPhone, text_content: textContent } = request.body;
+  const {
+    recipient_phone: recipientPhone,
+    text_content: textContent,
+    media_url: mediaUrl,
+    media_filename: mediaFilename,
+    buttons,
+  } = request.body;
   if (!recipientPhone || !textContent) {
     return response.status(400).json({ detail: "recipient_phone and text_content are required" });
   }
   try {
-    const messageId = await queueOutbound(recipientPhone, textContent, mediaUrl, mediaFilename);
+    const messageId = await queueOutbound(recipientPhone, textContent, mediaUrl, mediaFilename, buttons);
     return response.status(202).json({ accepted: true, message_id: messageId });
   } catch (error) {
     logger.error({ error }, "Failed to send outbound WhatsApp message");

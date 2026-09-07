@@ -229,18 +229,18 @@ Enable `ACTIVE` students to submit fleet leads while strictly enforcing anti-dup
 
 ### Tasks
 
-- [ ] **Interactive Lead Submission Flow:**
+- [x] **Interactive Lead Submission Flow:**
   - **Step 1:** Prompt for Fleet Owner / Manager Cellphone Number.
     - Immediate Check: Query `transporters` table for `fleet_owner_phone`.
     - If found: Cancel submission instantly. Send non-cluttered response: "❌ Transporter phone number already registered in APEX network."
   - **Step 2:** Prompt for Company Name.
   - **Step 3:** Prompt for Truck Count.
   - **Step 4:** Prompt for Truck Type using WhatsApp Interactive Buttons (Superlink, Lowbed, Mixed).
-- [ ] **Lead Persistence:**
+- [x] **Lead Persistence:**
   - Save lead to `transporters` with status `NEW_LEAD`.
   - Link lead to `student_id`.
   - Dispatch automated alert to APEX Staff WhatsApp line (`/pending` queue).
-- [ ] **Student Pipeline Summary (`/status` or Button Click):**
+- [x] **Student Pipeline Summary (`/status` or Button Click):**
   - Query active leads belonging to `student_id`.
   - Format response into simplified student-facing milestones:
     - `NEW_LEAD` → Under Review

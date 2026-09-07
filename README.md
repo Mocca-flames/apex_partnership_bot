@@ -1,8 +1,8 @@
 # APEX Partnership
 
-## Phase 1
+## Current Phase: 4
 
-Phase 1 provides the Docker Compose stack, PostgreSQL schema migrations, FastAPI WhatsApp webhook, and Baileys gateway adapter.
+The project now includes the Phase 4 lead intake engine: ACTIVE students can submit transporter leads through WhatsApp, duplicate fleet-owner numbers are rejected, leads are persisted as `NEW_LEAD`, staff receive queue alerts, and students can reply `STATUS` to view their pipeline.
 
 ### Start
 
@@ -24,4 +24,4 @@ docker compose ps
 
 The backend migration runs automatically before FastAPI starts. The normalized inbound webhook is `POST /webhook/whatsapp`; outbound messages use `POST /api/v1/messages`.
 
-Phase 2 signup, OTP linking, tutorial flows, lead intake, and staff commands are intentionally not included in this Phase 1 implementation.
+Staff slash commands and vetting operations remain scheduled for Phase 5.

@@ -16,6 +16,7 @@ class OutboundMessage(BaseModel):
     text_content: str = Field(min_length=1)
     media_url: str | None = None
     media_filename: str | None = None
+    buttons: list[str] | None = None
 
 
 class WebhookResponse(BaseModel):
