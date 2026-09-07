@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-apex_partnership}
+      POSTGRES_USER: ${POSTGRES_USER:-apex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apex_dev_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://apex:apex_dev_password@postgres:5432/apex_partnership}
+      BAILEYS_GATEWAY_URL: ${BAILEYS_GATEWAY_URL:-http://baileys-gateway:3000}
+      WEBHOOK_SHARED_SECRET: ${WEBHOOK_SHARED_SECRET:-dev-webhook-secret}
+      APEX_STAFF_GROUP_PHONE: ${APEX_STAFF_GROUP_PHONE:-}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend/app/static/tutorial-placeholder.pdf:/app/tutorial-placeholder.pdf:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      baileys-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  baileys-gateway:
+    build: ./baileys-gateway
+    environment:
+      BACKEND_WEBHOOK_URL: ${BACKEND_WEBHOOK_URL:-http://backend:8000/webhook/whatsapp}
+      WEBHOOK_SHARED_SECRET: ${WEBHOOK_SHARED_SECRET:-dev-webhook-secret}
+      GATEWAY_PORT: 3000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${BAILEYS_PORT:-3000}:3000"
+    volumes:
+      - ./baileys-sessions:/app/sessions
+      - ./backend/app/static/tutorial-placeholder.pdf:/app/tutorial-placeholder.pdf:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
