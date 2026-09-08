@@ -1,0 +1,219 @@
+================================================================================
+  APEX PARTNERSHIP — TUTORIAL IMAGE GENERATION PROMPTS
+  Use these prompts in ChatGPT (DALL-E) or Midjourney to generate images
+  for the Student Partner Tutorial PDF.
+================================================================================
+
+BRAND COLORS REFERENCE:
+  Primary:      #0d1f3c (Apex Navy), #1e3a5f (Navy Mid), #2a4a73 (Navy Light)
+  Action:       #c2410c (Apex Orange), #ea580c (Orange Hot)
+  Neutrals:     #ffffff (White), #f5f4f0 (Off-White), #e8e5df (Stone), #111827 (Charcoal), #6b7280 (Muted)
+  Functional:   #16a34a (Success Green), #d97706 (Warning Amber), #dc2626 (Error Red)
+  Load Gauge:   #F2B705 (Yellow/Weigh), #E1672B (Orange/Tarp), #1E7F72 (Teal/Route)
+
+STYLE: Clean, modern, corporate tech. Flat design with subtle gradients.
+       No photorealism. Use vector-style illustrations.
+
+================================================================================
+  IMAGE 1 — COVER / HERO IMAGE
+================================================================================
+
+PROMPT (DALL-E / ChatGPT):
+  "A modern flat-design hero illustration for a student logistics partnership
+   program. Split composition: left side shows a stylized university campus
+   with graduation caps, right side shows a fleet of cargo trucks on a highway
+   stretching toward the Southern African continent silhouette.
+   A glowing orange (#c2410c) WhatsApp chat bubble connects both sides.
+   Background gradient from deep navy (#0d1f3c) at top to navy mid (#1e3a5f)
+   at bottom. Clean vector style, corporate tech aesthetic.
+   Do not include any text in the image.
+   Aspect ratio: 16:9, landscape orientation."
+
+PROMPT (Midjourney):
+  /imagine prompt: A modern flat-design hero illustration for a student logistics
+  partnership program. Split composition: left side shows stylized university campus
+  with graduation caps, right side shows fleet of cargo trucks on highway stretching
+  toward Southern African continent silhouette horizon. Glowing orange (#c2410c)
+  WhatsApp chat bubble connecting both sides. Background gradient deep navy (#0d1f3c)
+  to navy mid (#1e3a5f). Clean vector style, corporate tech aesthetic.
+  No text, no words, no letters. --ar 16:9 --style raw --s 250
+
+================================================================================
+  IMAGE 2 — STEP 1: GET THE TUTORIAL PDF
+================================================================================
+
+PROMPT (DALL-E / ChatGPT):
+  "A flat-design illustration of a smartphone with a WhatsApp chat. The screen
+   shows a message being sent that triggers a PDF document icon being received
+   from the bot. The PDF icon is large, centered, in navy (#1e3f3c) with an
+   orange (#c2410c) corner fold. A subtle glow or radiating lines around the
+   PDF icon indicate it was just delivered.
+   Background: off-white (#f5f4f0) with subtle geometric patterns.
+   Clean vector illustration, no photorealism. No text in the image.
+   Aspect ratio: 1:1, square format."
+
+PROMPT (Midjourney):
+  /imagine prompt: Flat-design illustration of smartphone with WhatsApp chat.
+  Screen shows PDF document icon being received from bot. Large centered PDF icon
+  in navy (#1e3f3c) with orange (#c2410c) corner fold. Subtle radiating lines
+  around PDF indicating delivery. Background off-white (#f5f4f0) with geometric
+  patterns. Clean vector style. No text, no words. --ar 1:1 --style raw --s 250
+
+================================================================================
+  IMAGE 3 — STEP 2: PASS THE PRACTICE TEST
+================================================================================
+
+PROMPT (DALL-E / ChatGPT):
+  "A flat-design illustration of a smartphone with a WhatsApp chat. The screen
+   shows two message bubbles: the user sends a green (#16a34a) bubble, and the
+   bot replies with a practice test card on a dark navy (#0d1f3c) background.
+   The card has three horizontal fields, each with an orange (#c2410c) accent
+   line on the left side, representing phone, company, and truck count inputs.
+   In the bottom-right corner, a small circular indicator shows 3 dots
+   (2 filled orange, 1 empty grey) representing the 3 allowed attempts.
+   Background: off-white (#f5f4f0).
+   Clean vector illustration. No text in the image.
+   Aspect ratio: 1:1, square format."
+
+PROMPT (Midjourney):
+  /imagine prompt: Flat-design illustration of smartphone with WhatsApp chat.
+  User sends green (#16a34a) bubble, bot replies with practice test card on dark
+  navy (#0d1f3c) background. Card has three fields with orange (#c2410c) accent
+  lines representing inputs. Corner shows 3 dots indicator (2 orange filled,
+  1 empty grey). Background off-white (#f5f4f0). Clean vector style.
+  No text, no words. --ar 1:1 --style raw --s 250
+
+================================================================================
+  IMAGE 4 — STEP 3: SUBMIT A LEAD (4-STEP WIZARD)
+================================================================================
+
+PROMPT (DALL-E / ChatGPT):
+  "A flat-design illustration showing a 4-step conversational flow on a smartphone
+   WhatsApp screen. Four message bubble pairs in sequence:
+   Step 1: Bot asks for phone number, user replies with digits.
+   Step 2: Bot asks for company name, user replies with a name.
+   Step 3: Bot asks for truck count, user replies with a number.
+   Step 4: Bot shows 3 selectable buttons: Superlink (orange #c2410c),
+   Lowbed (teal #1E7F72), Mixed (yellow #F2B705).
+   Each step has a numbered circle (1-4) on the left side in orange.
+   Background: off-white (#f5f4f0) with faint truck silhouettes.
+   Clean vector illustration. No text in the image.
+   Aspect ratio: 9:16, portrait/vertical format."
+
+PROMPT (Midjourney):
+  /imagine prompt: Flat-design illustration showing 4-step WhatsApp conversation
+  flow on smartphone. Four message pairs: bot asks phone, user replies; bot asks
+  company, user replies; bot asks truck count, user replies; bot shows 3 buttons
+  — Superlink (orange #c2410c), Lowbed (teal #1E7F72), Mixed (yellow #F2B705).
+  Numbered circles 1-4 on left in orange. Background off-white (#f5f4f0) with
+  faint truck silhouettes. Clean vector style. No text, no words.
+  --ar 9:16 --style raw --s 250
+
+================================================================================
+  IMAGE 5 — STEP 4: CHECK YOUR STATUS
+================================================================================
+
+PROMPT (DALL-E / ChatGPT):
+  "A flat-design illustration of a smartphone showing a WhatsApp status update.
+   The user has sent a message, and the bot reply shows a lead pipeline card
+   with 3 entries, each with a colored status dot:
+   1. Company name (12 trucks) with a teal (#1E7F72) dot — Verified
+   2. Company name (5 trucks) with a yellow (#F2B705) dot — Under Review
+   3. Company name (8 trucks) with a green (#16a34a) dot and sparkle icon — Paid
+   A small coin icon appears near the Paid entry.
+   Background: off-white (#f5f4f0).
+   Clean vector illustration. No text in the image.
+   Aspect ratio: 1:1, square format."
+
+PROMPT (Midjourney):
+  /imagine prompt: Flat-design illustration of smartphone showing WhatsApp status
+  update. Bot reply shows lead pipeline card with 3 entries: company with teal dot
+  (Verified), company with yellow dot (Under Review), company with green dot and
+  sparkle (Paid). Coin icon near Paid entry. Background off-white (#f5f4f0).
+  Clean vector style. No text, no words. --ar 1:1 --style raw --s 250
+
+================================================================================
+  IMAGE 6 — LEAD LIFECYCLE DIAGRAM
+================================================================================
+
+PROMPT (DALL-E / ChatGPT):
+  "A clean flat-design horizontal flow diagram showing the lifecycle of a logistics
+   lead. Four rounded rectangle boxes connected by orange (#c2410c) arrows:
+   Box 1: Deep navy (#0d1f3c) background with a clock icon
+   Box 2: Navy mid (#1e3a5f) background with a checkmark icon
+   Box 3: Teal (#1E7F72) background with a truck icon
+   Box 4: Green (#16a34a) background with a money/cash icon
+   Below the main flow, a branching red (#dc2626) box with an X icon.
+   Background: white (#ffffff).
+   Clean vector diagram style, minimal, professional.
+   No text, no words, no letters in the image.
+   Aspect ratio: 16:9, landscape format."
+
+PROMPT (Midjourney):
+  /imagine prompt: Clean flat-design horizontal flow diagram of logistics lead
+  lifecycle. Four rounded boxes connected by orange (#c2410c) arrows: deep navy
+  box with clock icon, navy mid box with checkmark, teal box with truck icon,
+  green box with money icon. Branching red (#dc2626) box below with X icon.
+  White background. Professional vector diagram. No text, no words.
+  --ar 16:9 --style raw --s 250
+
+================================================================================
+  IMAGE 7 — COMMISSION STRUCTURE INFOGRAPHIC
+================================================================================
+
+PROMPT (DALL-E / ChatGPT):
+  "A flat-design infographic showing commission earnings. Four stacked horizontal
+   bars with truck silhouettes at the end of each:
+   Bar 1: Short bar, yellow (#F2B705) fill
+   Bar 2: Medium bar, orange (#E1672B) fill
+   Bar 3: Long bar, teal (#1E7F72) fill
+   Bar 4: Full-width bar, green (#16a34a) fill with sparkle
+   A large circular badge in the corner with an orange (#c2410c) ring.
+   Background: off-white (#f5f4f0).
+   Clean vector infographic style.
+   No text, no words, no letters in the image.
+   Aspect ratio: 1:1, square format."
+
+PROMPT (Midjourney):
+  /imagine prompt: Flat-design infographic showing commission earnings. Four
+  horizontal bars with truck silhouettes: short yellow (#F2B705), medium orange
+  (#E1672B), long teal (#1E7F72), full green (#16a34a) with sparkle. Circular
+  badge with orange (#c2410c) ring. Off-white background. Clean vector style.
+  No text, no words. --ar 1:1 --style raw --s 250
+
+================================================================================
+  NOTES FOR IMAGE GENERATION
+================================================================================
+
+1. CONSISTENCY: Use the same visual style across all images (flat vector, clean
+   lines, minimal gradients). This ensures the PDF looks cohesive.
+
+2. BRAND COLORS: Always reference the exact hex codes provided. For DALL-E, mention
+   the color names and hex values. For Midjourney, use --style raw and include
+   hex values in the prompt.
+
+3. TEXT OVERLAYS: DALL-E and Midjourney may not render text accurately. All prompts
+   request NO TEXT in the generated image. Add text overlays manually in a design
+   tool (Figma, Canva, Adobe Illustrator) after generation.
+
+4. FILE FORMAT: Export all images as PNG with transparent or white backgrounds.
+   Use 2x resolution for crisp rendering in PDF.
+
+5. PDF PLACEMENT: Map images to the TUTORIAL.md sections:
+   - Cover image: PDF title page / header
+   - Image 2 (Tutorial PDF): Step 1 section
+   - Image 3 (Practice Test): Step 2 section
+   - Image 4 (Submit Lead): Step 3 section
+   - Image 5 (Check Status): Step 4 section
+   - Image 6 (Lifecycle): Lead Lifecycle section
+   - Image 7 (Commission): How Much You Earn section
+
+6. MIDJOURNEY: Always append --no text, words, letters, typography to avoid
+   garbled text generation. Add text manually in post-production.
+
+7. DALL-E: Request "no text in the image" in the prompt and overlay text using
+   a separate tool for maximum control over typography and brand compliance.
+
+================================================================================
+  END OF IMAGE GENERATION PROMPTS
+================================================================================

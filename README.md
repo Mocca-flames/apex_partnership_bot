@@ -25,3 +25,18 @@ docker compose ps
 The backend migration runs automatically before FastAPI starts. The normalized inbound webhook is `POST /webhook/whatsapp`; outbound messages use `POST /api/v1/messages`.
 
 Staff slash commands are now active (Phase 5).
+
+### Seed staff access
+
+Run this from the directory containing `docker-compose.yml` on the deployment VM:
+
+```sh
+docker compose run --rm backend python -m app.seed_staff \
+	--phone 27712345678 \
+	--name "APEX Admin" \
+	--role ADMIN
+```
+
+The command is idempotent: running it again updates the staff name or role without
+creating a duplicate. Use international digits for `--phone`; spaces, `+`, and
+parentheses are removed before storing the number.
