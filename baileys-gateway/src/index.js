@@ -74,8 +74,9 @@ function queueOutbound(recipientPhone, textContent, mediaUrl, mediaFilename, but
 }
 
 async function relayInbound(message) {
-  const jid = message.key?.participant || message.key?.remoteJid || "";
-  if (!jid || jid === "status@broadcast" || message.key?.fromMe) return;
+  const remoteJid = message.key?.remoteJid || "";
+  if (!remoteJid || remoteJid === "status@broadcast" || message.key?.fromMe) return;
+  const jid = message.key?.remoteJidAlt || message.key?.participant || remoteJid;
 
   const textContent = message.message?.conversation
     || message.message?.extendedTextMessage?.text
