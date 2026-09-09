@@ -4,6 +4,7 @@ import time
 from collections import defaultdict
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from uuid import uuid4
 
@@ -187,15 +188,18 @@ async def whatsapp_webhook(
 
     # ── IDENTITY GATE ──────────────────────────────────────────────────────
     # Resolve who is sending: staff, linked student, unlinked student, or unknown.
-    staff_member = _is_staff(db, message.sender_phone)
+    # Normalize the inbound phone so comparisons work regardless of formatting.
+    normalized_sender = normalize_phone(message.sender_phone)
+
+    staff_member = _is_staff(db, normalized_sender)
     linked_student = db.query(Student).filter(
-        Student.whatsapp_number == message.sender_phone,
+        Student.whatsapp_number == normalized_sender,
     ).first()
 
     unlinked_student = None
     if not staff_member and not linked_student:
         unlinked_student = db.query(Student).filter(
-            Student.phone == message.sender_phone,
+            func.regexp_replace(Student.phone, r"\D", "", "g") == normalized_sender,
             Student.whatsapp_number.is_(None),
         ).first()
     # ────────────────────────────────────────────────────────────────────────
@@ -472,7 +476,7 @@ async def whatsapp_webhook(
         student = db.query(Student).filter(Student.auth_passcode == message.text_content.strip()).first()
         if student:
             existing = db.query(Student).filter(
-                Student.whatsapp_number == message.sender_phone,
+                Student.whatsapp_number == normalized_sender,
                 Student.id != student.id
             ).first()
             if existing:
@@ -487,14 +491,14 @@ async def whatsapp_webhook(
                     "❌ This WhatsApp number is already linked to another account.",
                 )
                 return WebhookResponse(accepted=True, message_id=inbound_id)
-            if student.whatsapp_number == message.sender_phone:
+            if student.whatsapp_number == normalized_sender:
                 await send_whatsapp_message(
                     message.sender_phone,
                     "ℹ️ This number is already linked to your account.",
                 )
                 return WebhookResponse(accepted=True, message_id=inbound_id)
 
-            student.whatsapp_number = message.sender_phone
+            student.whatsapp_number = normalized_sender
             student.auth_passcode = None
             student.status = "TUTORIAL"
             db.add(AuditLog(
