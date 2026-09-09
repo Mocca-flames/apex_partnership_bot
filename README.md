@@ -32,7 +32,7 @@ Run this from the directory containing `docker-compose.yml` on the deployment VM
 
 ```sh
 docker compose run --rm backend python -m app.seed_staff \
-	--phone 27712345678 \
+	--phone 27730315355 \
 	--name "APEX Admin" \
 	--role ADMIN
 ```
