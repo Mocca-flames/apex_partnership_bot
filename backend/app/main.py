@@ -439,40 +439,7 @@ async def whatsapp_webhook(
         # Staff sent a non-command non-AUTH message — ignore
         return WebhookResponse(accepted=True, message_id=inbound_id)
 
-    # ── UNKNOWN SENDER (not in staff table, not a linked student) ───────────
-    if not linked_student and not unlinked_student:
-        db.add(AuditLog(
-            event_type="UNKNOWN_SENDER_IGNORED",
-            actor_phone=message.sender_phone,
-            payload={"text_preview": message.text_content[:100]},
-        ))
-        db.commit()
-        return WebhookResponse(accepted=True, message_id=inbound_id)
-
-    # ── UNLINKED STUDENT (signed up, phone not bound yet) ──────────────────
-    if unlinked_student:
-        # Allow AUTH- passcode to link their phone
-        if message.text_content.startswith("AUTH-"):
-            pass  # fall through to AUTH handler below
-        else:
-            # Prompt them with their OTP so they can link
-            if unlinked_student.auth_passcode:
-                await send_whatsapp_message(
-                    message.sender_phone,
-                    f"👋 Welcome {unlinked_student.first_name}!\n\n"
-                    f"Your verification code is: *{unlinked_student.auth_passcode}*\n\n"
-                    "Send this code back to link your WhatsApp to your APEX account.",
-                )
-            else:
-                await send_whatsapp_message(
-                    message.sender_phone,
-                    f"👋 Welcome {unlinked_student.first_name}!\n\n"
-                    "Your account is pending verification.\n"
-                    "Please contact APEX staff to receive your verification code.",
-                )
-            return WebhookResponse(accepted=True, message_id=inbound_id)
-
-    # ── AUTH PASSCODE HANDLER (staff + linked + unlinked all converge here) ─
+    # ── AUTH PASSCODE HANDLER (all senders converge here) ─
     if message.text_content.startswith("AUTH-"):
         student = db.query(Student).filter(Student.auth_passcode == message.text_content.strip()).first()
         if student:
@@ -526,6 +493,34 @@ async def whatsapp_webhook(
             message.sender_phone,
             "❌ Invalid passcode. Please check and try again.",
         )
+        return WebhookResponse(accepted=True, message_id=inbound_id)
+
+    # ── UNKNOWN SENDER (not in staff table, not a linked student) ───────────
+    if not linked_student and not unlinked_student:
+        db.add(AuditLog(
+            event_type="UNKNOWN_SENDER_IGNORED",
+            actor_phone=message.sender_phone,
+            payload={"text_preview": message.text_content[:100]},
+        ))
+        db.commit()
+        return WebhookResponse(accepted=True, message_id=inbound_id)
+
+    # ── UNLINKED STUDENT (signed up, phone not bound yet) ──────────────────
+    if unlinked_student:
+        if unlinked_student.auth_passcode:
+            await send_whatsapp_message(
+                message.sender_phone,
+                f"👋 Welcome {unlinked_student.first_name}!\n\n"
+                f"Your verification code is: *{unlinked_student.auth_passcode}*\n\n"
+                "Send this code back to link your WhatsApp to your APEX account.",
+            )
+        else:
+            await send_whatsapp_message(
+                message.sender_phone,
+                f"👋 Welcome {unlinked_student.first_name}!\n\n"
+                "Your account is pending verification.\n"
+                "Please contact APEX staff to receive your verification code.",
+            )
         return WebhookResponse(accepted=True, message_id=inbound_id)
 
     # ── LINKED STUDENT ONLY BELOW ──────────────────────────────────────────
