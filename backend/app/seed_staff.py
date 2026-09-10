@@ -1,15 +1,30 @@
 import argparse
 import re
+import sys
+from pathlib import Path
 
-from .database import SessionLocal
-from .models import ApexStaff
+_root = Path(__file__).resolve().parent
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
+from database import SessionLocal
+from models import ApexStaff
+
+SA_PREFIX = "27"
+SA_HUMAN_PREFIX = "0"
+SA_HUMAN_LENGTH = 10
+SA_INTERNATIONAL_LENGTH = 11
 
 
 def normalize_phone(value: str) -> str:
-    phone = re.sub(r"\D", "", value)
-    if not 8 <= len(phone) <= 15:
-        raise ValueError("phone must contain between 8 and 15 digits")
-    return phone
+    digits = re.sub(r"\D", "", value)
+    if not digits:
+        return digits
+    if digits.startswith(SA_HUMAN_PREFIX) and len(digits) == SA_HUMAN_LENGTH:
+        return SA_PREFIX + digits[1:]
+    if digits.startswith(SA_PREFIX) and len(digits) == SA_INTERNATIONAL_LENGTH:
+        return digits
+    return digits
 
 
 def parse_args() -> argparse.Namespace:

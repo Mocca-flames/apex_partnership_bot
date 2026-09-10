@@ -1,0 +1,39 @@
+[
+  {
+    "first_name": "Keabetswe",
+    "surname": "Ntuli",
+    "email": "48308366@nwu.ac.za",
+    "phone": "27799693574",
+    "university": "NWU",
+    "field": "Logistics",
+    "study_year": 3
+  },
+  {
+    "first_name": "kutlwano",
+    "surname": "Maninjwa",
+    "email": "kutlwanomaninjwa@nwu.ac.za",
+    "phone":"27697897769",
+    "university": "NWU",
+    "field": "Logistics",
+    "study_year": 3
+  },
+  {
+    "first_name": "Mpho",
+    "surname": "Makabole",
+    "email": "53547594@nwu.ac.za",
+    "phone":"27618604839",
+    "university": "NWU",
+    "field": "Logistics",
+    "study_year": 3
+  },
+   {
+    "first_name": "Tumelo",
+    "surname": "Mosehle",
+    "email": "46590110@nwu.ac.za",
+    "phone":"27604753233",
+    "university": "NWU",
+    "field": "Logistics",
+    "study_year": 3
+  }
+  
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "first_name": "John",
+    "surname": "Doe",
+    "email": "john.doe@example.com",
+    "phone": "27820000001",
+    "university": "University of Cape Town",
+    "field": "Logistics",
+    "study_year": 3
+  },
+  {
+    "first_name": "Jane",
+    "surname": "Smith",
+    "email": "jane.smith@example.com",
+    "phone": "27820000002",
+    "university": "University of Johannesburg",
+    "field": "Supply Chain",
+    "study_year": 2
+  }
+]

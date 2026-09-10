@@ -11,8 +11,9 @@ from uuid import uuid4
 from .config import settings
 from .database import get_db
 from .models import ApexStaff, AuditLog, LeadSubmissionSession, Student, Transporter
-from .routers import students
+from .routers import students, staff
 from .schemas import InboundMessage, OutboundMessage, WebhookResponse
+from .utils import normalize_phone
 
 app = FastAPI(title="APEX Partnership API", version="0.2.0")
 
@@ -25,6 +26,7 @@ app.add_middleware(
 )
 
 app.include_router(students.router)
+app.include_router(staff.router)
 
 PRACTICE_PHONE = "27820000000"
 PRACTICE_COMPANY = "APEX PRACTICE LOGISTICS"
@@ -87,7 +89,7 @@ def practice_submission_errors(fields: dict[str, str] | None) -> list[str]:
         return ["Use this format: PHONE: 27820000000, COMPANY: APEX PRACTICE LOGISTICS, TRUCKS: 5."]
 
     errors = []
-    phone = re.sub(r"\D", "", fields.get("phone", ""))
+    phone = normalize_phone(fields.get("phone", ""))
     if phone != PRACTICE_PHONE:
         errors.append(f"the phone must be {PRACTICE_PHONE}")
     if fields.get("company", "").strip().upper() != PRACTICE_COMPANY:
@@ -95,10 +97,6 @@ def practice_submission_errors(fields: dict[str, str] | None) -> list[str]:
     if fields.get("trucks") != str(PRACTICE_TRUCK_COUNT):
         errors.append(f"the truck count must be {PRACTICE_TRUCK_COUNT}")
     return errors
-
-
-def normalize_phone(phone: str) -> str:
-    return re.sub(r"\D", "", phone)
 
 
 def lead_status_label(status_val: str) -> str:
@@ -130,7 +128,7 @@ async def notify_staff_of_lead(db: Session, lead: Transporter, student: Student)
         f"Student ID: {student.id}\n"
         "Use /pending to review the queue."
     )
-    recipients = [settings.apex_staff_group_phone] if settings.apex_staff_group_phone else [
+    recipients = [normalize_phone(settings.apex_staff_group_phone)] if settings.apex_staff_group_phone else [
         staff.phone_number for staff in db.query(ApexStaff).filter(ApexStaff.role.in_(["ADMIN", "STAFF"])).all()
     ]
     for recipient in recipients:
@@ -152,7 +150,7 @@ async def notify_staff_of_hold(db: Session, student: Student, sender_phone: str)
         f"Chat link: https://wa.me/{chat_phone}\n"
         "Please review and contact the student before reactivation."
     )
-    recipients = [settings.apex_staff_group_phone] if settings.apex_staff_group_phone else [
+    recipients = [normalize_phone(settings.apex_staff_group_phone)] if settings.apex_staff_group_phone else [
         staff.phone_number for staff in db.query(ApexStaff).filter(ApexStaff.role.in_(["ADMIN", "STAFF"])).all()
     ]
     for recipient in recipients:
@@ -161,7 +159,10 @@ async def notify_staff_of_hold(db: Session, student: Student, sender_phone: str)
 
 
 def _is_staff(db: Session, phone: str) -> ApexStaff | None:
-    return db.query(ApexStaff).filter(ApexStaff.phone_number == phone).first()
+    normalized = normalize_phone(phone)
+    return db.query(ApexStaff).filter(
+        func.regexp_replace(ApexStaff.phone_number, r"\D", "", "g") == normalized
+    ).first()
 
 
 @app.post("/webhook/whatsapp", response_model=WebhookResponse, status_code=status.HTTP_202_ACCEPTED)
