@@ -199,10 +199,10 @@ async def whatsapp_webhook(
 
     unlinked_student = None
     if not staff_member and not linked_student:
-        unlinked_student = db.query(Student).filter(
-            func.regexp_replace(Student.phone, r"\D", "", "g") == normalized_sender,
-            Student.whatsapp_number.is_(None),
-        ).first()
+        for candidate in db.query(Student).filter(Student.whatsapp_number.is_(None)).all():
+            if normalize_phone(candidate.phone) == normalized_sender:
+                unlinked_student = candidate
+                break
     # ────────────────────────────────────────────────────────────────────────
 
     # ── STAFF ──────────────────────────────────────────────────────────────
