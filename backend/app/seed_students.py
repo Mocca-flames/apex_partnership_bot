@@ -1,7 +1,5 @@
 import argparse
 import json
-import re
-import secrets
 import sys
 from pathlib import Path
 
@@ -9,17 +7,11 @@ _root = Path(__file__).resolve().parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from database import SessionLocal
-from models import Student
+from app.database import SessionLocal
+from app.models import Student
+from app.utils import normalize_phone
 from uuid import uuid4
-from utils import normalize_phone
-
-
-def normalize_phone(value: str) -> str:
-    phone = re.sub(r"\D", "", value)
-    if not 8 <= len(phone) <= 15:
-        raise ValueError(f"phone must contain between 8 and 15 digits, got {phone}")
-    return phone
+import secrets
 
 
 def generate_passcode() -> str:
