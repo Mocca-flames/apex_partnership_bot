@@ -90,15 +90,15 @@ def main():
         count = len(args.phone)
         for i in range(count):
             student: dict = {"phone": args.phone[i]}
-            if i < len(args.name):
+            if args.name and i < len(args.name):
                 name_parts = args.name[i].split(" ", 1)
                 student["first_name"] = name_parts[0]
                 student["surname"] = name_parts[1] if len(name_parts) > 1 else ""
-            if i < len(args.email):
+            if args.email and i < len(args.email):
                 student["email"] = args.email[i]
-            if i < len(args.university):
+            if args.university and i < len(args.university):
                 student["university"] = args.university[i]
-            if i < len(args.field):
+            if args.field and i < len(args.field):
                 student["field"] = args.field[i]
             if args.year and i < len(args.year):
                 student["study_year"] = args.year[i]
